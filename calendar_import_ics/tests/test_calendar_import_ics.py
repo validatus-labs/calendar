@@ -11,7 +11,7 @@ from odoo.tests.common import TransactionCase
 
 class TestImportIcs(TransactionCase):
     def setUp(self):
-        super(TestImportIcs, self).setUp()
+        super().setUp()
         self.event_model = self.env["calendar.event"]
         self.import_wiz = self.env["calendar.import.ics"]
 
