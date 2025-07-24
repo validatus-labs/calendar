@@ -25,7 +25,7 @@ class CalendarExportIcs(models.TransientModel):
 
     @api.model
     def default_get(self, fields):
-        defaults = super(CalendarExportIcs, self).default_get(fields)
+        defaults = super().default_get(fields)
         user = self.env.user
         if user.partner_id:
             defaults["partner_id"] = user.partner_id.id

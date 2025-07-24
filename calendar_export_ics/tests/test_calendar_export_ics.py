@@ -11,7 +11,7 @@ from odoo.tests.common import TransactionCase
 
 class TestExportIcs(TransactionCase):
     def setUp(self):
-        super(TestExportIcs, self).setUp()
+        super().setUp()
         self.event_model = self.env["calendar.event"]
         self.partner_model = self.env["res.partner"]
         self.export_wiz = self.env["calendar.export.ics"]

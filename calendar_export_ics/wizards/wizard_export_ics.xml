@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <odoo>
-  <record id="calendar_export_ics_form" model="ir.ui.view">
+    <record id="calendar_export_ics_form" model="ir.ui.view">
         <field name="name">calendar.export.ics.form</field>
         <field name="model">calendar.export.ics</field>
         <field name="arch" type="xml">

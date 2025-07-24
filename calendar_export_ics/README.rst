@@ -17,18 +17,19 @@ Calendar - Export ics
     :target: http://www.gnu.org/licenses/agpl-3.0-standalone.html
     :alt: License: AGPL-3
 .. |badge3| image:: https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github
-    :target: https://github.com/OCA/calendar/tree/15.0/calendar_export_ics
+    :target: https://github.com/OCA/calendar/tree/18.0/calendar_export_ics
     :alt: OCA/calendar
 .. |badge4| image:: https://img.shields.io/badge/weblate-Translate%20me-F47D42.png
-    :target: https://translation.odoo-community.org/projects/calendar-15-0/calendar-15-0-calendar_export_ics
+    :target: https://translation.odoo-community.org/projects/calendar-18-0/calendar-18-0-calendar_export_ics
     :alt: Translate me on Weblate
 .. |badge5| image:: https://img.shields.io/badge/runboat-Try%20me-875A7B.png
-    :target: https://runboat.odoo-community.org/builds?repo=OCA/calendar&target_branch=15.0
+    :target: https://runboat.odoo-community.org/builds?repo=OCA/calendar&target_branch=18.0
     :alt: Try me on Runboat
 
 |badge1| |badge2| |badge3| |badge4| |badge5|
 
-This module adds a new wizard that allows you to export odoo calendar into an .ics file.
+This module adds a new wizard that allows you to export odoo calendar
+into an .ics file.
 
 **Table of contents**
 
@@ -40,14 +41,14 @@ Usage
 
 To use this module, follow these steps:
 
-#. Navigate to the Calendar App.
-#. Go to Configuration.
-#. Select Export to ICS File.
+1. Navigate to the Calendar App.
+2. Go to Configuration.
+3. Select Export to ICS File.
 
 When exporting, you have two options:
 
-* Specify the maximum date of the calendar you want to export.
-* Leave the date field empty to export all events from your calendar.
+- Specify the maximum date of the calendar you want to export.
+- Leave the date field empty to export all events from your calendar.
 
 Bug Tracker
 ===========
@@ -55,7 +56,7 @@ Bug Tracker
 Bugs are tracked on `GitHub Issues <https://github.com/OCA/calendar/issues>`_.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-`feedback <https://github.com/OCA/calendar/issues/new?body=module:%20calendar_export_ics%0Aversion:%2015.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
+`feedback <https://github.com/OCA/calendar/issues/new?body=module:%20calendar_export_ics%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**>`_.
 
 Do not contact contributors directly about support or help with technical issues.
 
@@ -63,20 +64,20 @@ Credits
 =======
 
 Authors
-~~~~~~~
+-------
 
 * ForgeFlow S.L.
 
 Contributors
-~~~~~~~~~~~~
+------------
 
-* Arnau Cruz <arnau.cruz@forgeflow.com>
+- Arnau Cruz <arnau.cruz@forgeflow.com>
 
-
-Do not contact contributors directly about support or help with technical issues.
+Do not contact contributors directly about support or help with
+technical issues.
 
 Maintainers
-~~~~~~~~~~~
+-----------
 
 This module is maintained by the OCA.
 
@@ -88,6 +89,6 @@ OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.
 
-This module is part of the `OCA/calendar <https://github.com/OCA/calendar/tree/15.0/calendar_export_ics>`_ project on GitHub.
+This module is part of the `OCA/calendar <https://github.com/OCA/calendar/tree/18.0/calendar_export_ics>`_ project on GitHub.
 
 You are welcome to contribute. To learn how please visit https://odoo-community.org/page/Contribute.
