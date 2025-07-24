@@ -5,8 +5,8 @@ import base64
 from datetime import datetime
 
 from odoo.exceptions import ValidationError
-from odoo.modules.module import get_module_resource
 from odoo.tests.common import TransactionCase
+from odoo.tools.misc import file_path
 
 
 class TestImportIcs(TransactionCase):
@@ -17,10 +17,8 @@ class TestImportIcs(TransactionCase):
 
     @classmethod
     def _get_test_file(cls, file_name):
-        file_path = get_module_resource(
-            "calendar_import_ics", "tests/sample_files", file_name
-        )
-        with open(file_path, "rb") as file:
+        path = file_path(f"calendar_import_ics/tests/sample_files/{file_name}")
+        with open(path, "rb") as file:
             return base64.encodebytes(file.read())
 
     def test_import_ics(self):
