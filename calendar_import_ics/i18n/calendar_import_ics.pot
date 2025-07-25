@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.0\n"
+"Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -84,11 +84,6 @@ msgid "Import Ics Filename"
 msgstr ""
 
 #. module: calendar_import_ics
-#: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics____last_update
-msgid "Last Modified on"
-msgstr ""
-
-#. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__write_uid
 msgid "Last Updated by"
 msgstr ""
@@ -99,8 +94,8 @@ msgid "Last Updated on"
 msgstr ""
 
 #. module: calendar_import_ics
+#. odoo-python
 #: code:addons/calendar_import_ics/wizards/wizard_import_ics.py:0
-#, python-format
 msgid "Only ics files are supported"
 msgstr ""
 
