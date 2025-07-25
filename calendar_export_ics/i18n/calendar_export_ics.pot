@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.0\n"
+"Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -68,11 +68,6 @@ msgstr ""
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_ics_file
 msgid "Ics Exported File"
-msgstr ""
-
-#. module: calendar_export_ics
-#: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics____last_update
-msgid "Last Modified on"
 msgstr ""
 
 #. module: calendar_export_ics
