@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-06-08 07:42+0000\n"
+"PO-Revision-Date: 2026-06-08 09:46+0000\n"
 "Last-Translator: Matjaz Mozetic <matjaz@luxim.si>\n"
 "Language-Team: none\n"
 "Language: sl\n"
@@ -26,7 +26,7 @@ msgstr "Koledarski dogodek"
 #: model:ir.model,name:calendar_import_ics.model_calendar_import_ics
 #: model:res.groups,name:calendar_import_ics.group_calendar_import
 msgid "Calendar Import Ics"
-msgstr ""
+msgstr "Uvoz koledarja ICS"
 
 #. module: calendar_import_ics
 #: model_terms:ir.ui.view,arch_db:calendar_import_ics.calendar_import_ics_form
@@ -51,7 +51,7 @@ msgstr "Prikazani naziv"
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_end_date
 msgid "End Import Date"
-msgstr ""
+msgstr "Končni datum uvoza"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_event__event_identifier
@@ -69,6 +69,7 @@ msgid ""
 "If checked, the previously imported events that are not in this import will "
 "be deleted"
 msgstr ""
+"Če je označeno, bodo prej uvoženi dogodki, ki niso v tem uvozu, izbrisani"
 
 #. module: calendar_import_ics
 #: model_terms:ir.ui.view,arch_db:calendar_import_ics.calendar_import_ics_form
@@ -80,12 +81,12 @@ msgstr "Uvozi"
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_ics_file
 #: model:ir.ui.menu,name:calendar_import_ics.menu_calendar_import_ics
 msgid "Import Ics File"
-msgstr ""
+msgstr "Uvozi datoteko ICS"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_ics_filename
 msgid "Import Ics Filename"
-msgstr ""
+msgstr "Ime datoteke uvoza ICS"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__write_uid
@@ -101,7 +102,7 @@ msgstr "Zadnjič posodobljeno"
 #. odoo-python
 #: code:addons/calendar_import_ics/wizards/wizard_import_ics.py:0
 msgid "Only ics files are supported"
-msgstr ""
+msgstr "Podprte so le datoteke ICS"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__partner_id
@@ -111,9 +112,9 @@ msgstr "Partner"
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__do_remove_old_event
 msgid "Remove old events?"
-msgstr ""
+msgstr "Odstrani stare dogodke?"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_start_date
 msgid "Start Import Date"
-msgstr ""
+msgstr "Začetni datum uvoza"
