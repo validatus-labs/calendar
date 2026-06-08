@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-06-08 07:39+0000\n"
+"PO-Revision-Date: 2026-06-08 07:42+0000\n"
 "Last-Translator: Matjaz Mozetic <matjaz@luxim.si>\n"
 "Language-Team: none\n"
 "Language: sl\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: model:ir.model,name:calendar_export_ics.model_calendar_export_ics
 #: model:res.groups,name:calendar_export_ics.group_calendar_export
 msgid "Calendar Export Ics"
-msgstr ""
+msgstr "Izvoz koledarja ICS"
 
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__create_uid
@@ -46,23 +46,23 @@ msgstr "Opravljeno"
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_end_date
 msgid "End Export Date"
-msgstr ""
+msgstr "Končni datum izvoza"
 
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_ics_filename
 msgid "Export Ics Filename"
-msgstr ""
+msgstr "Ime datoteke izvoza ICS"
 
 #. module: calendar_export_ics
 #: model:ir.actions.act_window,name:calendar_export_ics.action_export_ics_wizard
 #: model:ir.ui.menu,name:calendar_export_ics.menu_calendar_export_ics
 msgid "Export to Ics File"
-msgstr ""
+msgstr "Izvoz v datoteko ICS"
 
 #. module: calendar_export_ics
 #: model_terms:ir.ui.view,arch_db:calendar_export_ics.calendar_export_ics_form
 msgid "Generate ICS File"
-msgstr ""
+msgstr "Ustvari datoteko ICS"
 
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__id
@@ -72,7 +72,7 @@ msgstr "ID"
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__export_ics_file
 msgid "Ics Exported File"
-msgstr ""
+msgstr "Izvožena datoteka ICS"
 
 #. module: calendar_export_ics
 #: model:ir.model.fields,field_description:calendar_export_ics.field_calendar_export_ics__write_uid
