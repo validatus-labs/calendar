@@ -6,7 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2026-06-08 07:42+0000\n"
+"Last-Translator: Matjaz Mozetic <matjaz@luxim.si>\n"
 "Language-Team: none\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -14,11 +15,12 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: nplurals=4; plural=n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
 "n%100==4 ? 2 : 3;\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. module: calendar_import_ics
 #: model:ir.model,name:calendar_import_ics.model_calendar_event
 msgid "Calendar Event"
-msgstr ""
+msgstr "Koledarski dogodek"
 
 #. module: calendar_import_ics
 #: model:ir.model,name:calendar_import_ics.model_calendar_import_ics
@@ -29,22 +31,22 @@ msgstr ""
 #. module: calendar_import_ics
 #: model_terms:ir.ui.view,arch_db:calendar_import_ics.calendar_import_ics_form
 msgid "Cancel"
-msgstr ""
+msgstr "Prekliči"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__create_uid
 msgid "Created by"
-msgstr ""
+msgstr "Ustvaril"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__create_date
 msgid "Created on"
-msgstr ""
+msgstr "Ustvarjeno"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__display_name
 msgid "Display Name"
-msgstr ""
+msgstr "Prikazani naziv"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__import_end_date
@@ -54,12 +56,12 @@ msgstr ""
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_event__event_identifier
 msgid "Event Id"
-msgstr ""
+msgstr "ID dogodka"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__id
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,help:calendar_import_ics.field_calendar_import_ics__do_remove_old_event
@@ -71,7 +73,7 @@ msgstr ""
 #. module: calendar_import_ics
 #: model_terms:ir.ui.view,arch_db:calendar_import_ics.calendar_import_ics_form
 msgid "Import"
-msgstr ""
+msgstr "Uvozi"
 
 #. module: calendar_import_ics
 #: model:ir.actions.act_window,name:calendar_import_ics.action_import_ics_wizard
@@ -88,12 +90,12 @@ msgstr ""
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__write_uid
 msgid "Last Updated by"
-msgstr ""
+msgstr "Zadnji posodobil"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__write_date
 msgid "Last Updated on"
-msgstr ""
+msgstr "Zadnjič posodobljeno"
 
 #. module: calendar_import_ics
 #. odoo-python
@@ -104,7 +106,7 @@ msgstr ""
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__partner_id
 msgid "Partner"
-msgstr ""
+msgstr "Partner"
 
 #. module: calendar_import_ics
 #: model:ir.model.fields,field_description:calendar_import_ics.field_calendar_import_ics__do_remove_old_event
