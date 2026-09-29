@@ -1,7 +1,1 @@
-This module adds a new wizard that allows you to import .ics files into
-odoo calendar, importing events and the following attributes:
-
-- Summary
-- Start Date
-- End Date
-- UID
+This addon adds a Calendar wizard for uploading an iCalendar (`.ics`) file. It creates calendar events from the file and uses each event's unique identifier (UID) to update the same event on a later import. It supports timed events, all-day events, time zones, and basic repeating rules.

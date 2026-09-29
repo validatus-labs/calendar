@@ -2,6 +2,5 @@
 <odoo>
     <record id="group_calendar_import" model="res.groups">
         <field name="name">Calendar Import Ics</field>
-        <field name="category_id" ref="base.module_category_hidden" />
     </record>
 </odoo>

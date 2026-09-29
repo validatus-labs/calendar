@@ -374,15 +374,12 @@ ul.auto-toc {
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !! source digest: sha256:0b76e943a6186b958123d04eef313d6d66e7b9361daf4122b045fbca02b88b23
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! -->
-<p><a class="reference external image-reference" href="https://odoo-community.org/page/development-status"><img alt="Beta" src="https://img.shields.io/badge/maturity-Beta-yellow.png" /></a> <a class="reference external image-reference" href="http://www.gnu.org/licenses/agpl-3.0-standalone.html"><img alt="License: AGPL-3" src="https://img.shields.io/badge/license-AGPL--3-blue.png" /></a> <a class="reference external image-reference" href="https://github.com/OCA/calendar/tree/18.0/calendar_import_ics"><img alt="OCA/calendar" src="https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github" /></a> <a class="reference external image-reference" href="https://translation.odoo-community.org/projects/calendar-18-0/calendar-18-0-calendar_import_ics"><img alt="Translate me on Weblate" src="https://img.shields.io/badge/weblate-Translate%20me-F47D42.png" /></a> <a class="reference external image-reference" href="https://runboat.odoo-community.org/builds?repo=OCA/calendar&amp;target_branch=18.0"><img alt="Try me on Runboat" src="https://img.shields.io/badge/runboat-Try%20me-875A7B.png" /></a></p>
-<p>This module adds a new wizard that allows you to import .ics files into
-odoo calendar, importing events and the following attributes:</p>
-<ul class="simple">
-<li>Summary</li>
-<li>Start Date</li>
-<li>End Date</li>
-<li>UID</li>
-</ul>
+<p><a class="reference external image-reference" href="https://odoo-community.org/page/development-status"><img alt="Beta" src="https://img.shields.io/badge/maturity-Beta-yellow.png" /></a> <a class="reference external image-reference" href="http://www.gnu.org/licenses/agpl-3.0-standalone.html"><img alt="License: AGPL-3" src="https://img.shields.io/badge/license-AGPL--3-blue.png" /></a> <a class="reference external image-reference" href="https://github.com/OCA/calendar/tree/19.0/calendar_import_ics"><img alt="OCA/calendar" src="https://img.shields.io/badge/github-OCA%2Fcalendar-lightgray.png?logo=github" /></a> <a class="reference external image-reference" href="https://translation.odoo-community.org/projects/calendar-19-0/calendar-19-0-calendar_import_ics"><img alt="Translate me on Weblate" src="https://img.shields.io/badge/weblate-Translate%20me-F47D42.png" /></a> <a class="reference external image-reference" href="https://runboat.odoo-community.org/builds?repo=OCA/calendar&amp;target_branch=19.0"><img alt="Try me on Runboat" src="https://img.shields.io/badge/runboat-Try%20me-875A7B.png" /></a></p>
+<p>This addon adds a Calendar wizard for uploading an iCalendar (<tt class="docutils literal">.ics</tt>)
+file. It creates calendar events from the file and uses each event’s
+unique identifier (UID) to update the same event on a later import. It
+supports timed events, all-day events, time zones, and basic repeating
+rules.</p>
 <p><strong>Table of contents</strong></p>
 <div class="contents local topic" id="contents">
 <ul class="simple">
@@ -398,25 +395,47 @@ odoo calendar, importing events and the following attributes:</p>
 </div>
 <div class="section" id="usage">
 <h2><a class="toc-backref" href="#toc-entry-1">Usage</a></h2>
-<p>To use this module, follow these steps:</p>
+<p><strong>Before you start.</strong> Ask an administrator for the <strong>Calendar Import
+Ics</strong> access group. An ICS file is a calendar exchange file with a
+<tt class="docutils literal">.ics</tt> extension. Each event needs a unique identifier (UID), a title,
+a start, and an end. The wizard imports events into your own Odoo
+calendar.</p>
 <ol class="arabic simple">
-<li>Navigate to the Calendar App.</li>
-<li>Go to Configuration.</li>
-<li>Select Import ICS File.</li>
+<li>In the <strong>Calendar</strong> app, open <strong>Configuration</strong> and select <strong>Import
+Ics File</strong>. The import form appears.</li>
+<li>Set <strong>Start Import Date</strong> if events must start on or after that date.
+Leave it empty to include earlier events.</li>
+<li>Set <strong>End Import Date</strong> if events must end on or before that date.
+Leave it empty to include later events. Both date filters must be
+empty when the file contains a repeating event.</li>
+<li>Review <strong>Remove old events?</strong>. It is selected by default. When
+selected, the import removes events previously imported for your
+calendar that are missing from this file within the selected date
+range. Clear it if the file is only a partial calendar export or if
+you want to retain earlier imports. Events shared with another person
+remain on that person’s calendar.</li>
+<li>Upload the <tt class="docutils literal">.ics</tt> file in the file field and select <strong>Import</strong>.
+Odoo creates new events and updates existing events with the same
+UID. Importing the same file again should not create extra events.</li>
 </ol>
-<p>When importing, you have two options:</p>
-<ul class="simple">
-<li>Specify start and end dates to import events occurring within that
-range.</li>
-<li>Leave the date fields empty to import all events from the entire file.</li>
-</ul>
+<p><strong>Check the result and handle errors.</strong> Open the <strong>Calendar</strong> app and
+check an imported event’s title and dates. For example, an all-day event
+that starts on 1 September and has an exclusive ICS end date of 3
+September appears in Odoo on 1 and 2 September. A timed event is
+converted from its ICS time zone to the corresponding Odoo time.</p>
+<p>If Odoo rejects the file, correct it and upload it again. The wizard
+rejects malformed files, events without required fields, and recurrence
+exceptions such as <tt class="docutils literal">EXDATE</tt> or <tt class="docutils literal"><span class="pre">RECURRENCE-ID</span></tt>. A rejected import
+does not complete its cleanup step. Date filters for timed events use
+their UTC dates, so events near midnight can fall on a different date
+from the local calendar view.</p>
 </div>
 <div class="section" id="bug-tracker">
 <h2><a class="toc-backref" href="#toc-entry-2">Bug Tracker</a></h2>
 <p>Bugs are tracked on <a class="reference external" href="https://github.com/OCA/calendar/issues">GitHub Issues</a>.
 In case of trouble, please check there if your issue has already been reported.
 If you spotted it first, help us to smash it by providing a detailed and welcomed
-<a class="reference external" href="https://github.com/OCA/calendar/issues/new?body=module:%20calendar_import_ics%0Aversion:%2018.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**">feedback</a>.</p>
+<a class="reference external" href="https://github.com/OCA/calendar/issues/new?body=module:%20calendar_import_ics%0Aversion:%2019.0%0A%0A**Steps%20to%20reproduce**%0A-%20...%0A%0A**Current%20behavior**%0A%0A**Expected%20behavior**">feedback</a>.</p>
 <p>Do not contact contributors directly about support or help with technical issues.</p>
 </div>
 <div class="section" id="credits">
@@ -444,7 +463,7 @@ technical issues.</p>
 <p>OCA, or the Odoo Community Association, is a nonprofit organization whose
 mission is to support the collaborative development of Odoo features and
 promote its widespread use.</p>
-<p>This module is part of the <a class="reference external" href="https://github.com/OCA/calendar/tree/18.0/calendar_import_ics">OCA/calendar</a> project on GitHub.</p>
+<p>This module is part of the <a class="reference external" href="https://github.com/OCA/calendar/tree/19.0/calendar_import_ics">OCA/calendar</a> project on GitHub.</p>
 <p>You are welcome to contribute. To learn how please visit <a class="reference external" href="https://odoo-community.org/page/Contribute">https://odoo-community.org/page/Contribute</a>.</p>
 </div>
 </div>

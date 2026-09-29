@@ -2,19 +2,18 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html).
 
 import base64
-from datetime import datetime
+import binascii
+from datetime import date, datetime, time, timedelta, timezone
 
 import pytz
-from dateutil import parser
+import vobject
 
-from odoo import _, fields, models
+from odoo import Command, fields, models
 from odoo.exceptions import ValidationError
 
 
 class CalendarImportIcs(models.TransientModel):
-    """
-    This wizard is used to import ics files to calendar
-    """
+    """Import iCalendar events into the selected partner's calendar."""
 
     _name = "calendar.import.ics"
     _description = "Calendar Import Ics"
@@ -32,105 +31,160 @@ class CalendarImportIcs(models.TransientModel):
     )
 
     def button_import(self):
-        imported_events = []
         self.ensure_one()
-        assert self.import_ics_file
-        extension = self.import_ics_filename.split(".")[1]
-        if extension != "ics":
-            raise ValidationError(_("Only ics files are supported"))
-        if self.env.user and not self.partner_id:
-            self.partner_id = self.env.user.partner_id.id
-        file_decoded = base64.b64decode(self.import_ics_file)
-        file_str = file_decoded.decode("utf-8")
-        lines = file_str.split("\n")
-        ics_event = {}
-        for line in lines:
-            if line.startswith(("DTSTART", "DTEND")) and "TZID=" in line:
-                line = self.convert_date_to_z(line)
-            if line.startswith("BEGIN:VEVENT"):
-                ics_event = {}
-            elif line.startswith("END:VEVENT"):
-                self._process_event(ics_event, imported_events)
-            else:
-                if ":" in line:
-                    key, value = line.strip().split(":", 1)
-                    ics_event[key] = value
+        if not (self.import_ics_filename or "").lower().endswith(".ics"):
+            raise ValidationError(self.env._("Only .ics files are supported."))
+        if not self.partner_id:
+            self.partner_id = self.env.user.partner_id
+        if not self.partner_id:
+            raise ValidationError(
+                self.env._("Select a calendar owner before importing.")
+            )
+        try:
+            content = base64.b64decode(
+                b"".join(self.import_ics_file.split()), validate=True
+            ).decode("utf-8-sig")
+            calendar = vobject.readOne(content)
+            if calendar.name != "VCALENDAR":
+                raise ValueError("Missing VCALENDAR component")
+        except (
+            binascii.Error,
+            UnicodeError,
+            ValueError,
+            vobject.base.VObjectError,
+        ) as exc:
+            raise ValidationError(self.env._("Invalid ICS file: %s", exc)) from exc
+
+        imported_uids = set()
+        for component in calendar.contents.get("vevent", []):
+            uid = self._import_event(component)
+            if uid:
+                imported_uids.add(uid)
         if self.do_remove_old_event:
-            self._delete_non_imported_events(imported_events)
+            self._delete_non_imported_events(imported_uids)
 
-    def _process_event(self, ics_event, imported_events):
-        if "DTSTART" in ics_event and "DTEND" in ics_event:
-            event_start_date = self._parse_date(ics_event["DTSTART"])
-            event_end_date = self._parse_date(ics_event["DTEND"])
-            if (not self.import_start_date or not self.import_end_date) or (
-                self.import_start_date <= event_start_date.date()
-                and self.import_end_date >= event_end_date.date()
-            ):
-                imported_events.append(ics_event["UID"])
-                event = self.env["calendar.event"].search(
-                    [("event_identifier", "=", ics_event["UID"])]
+    def _import_event(self, component):
+        if {"recurrence-id", "exdate", "rdate", "exrule"} & component.contents.keys():
+            raise ValidationError(
+                self.env._("ICS recurrence exceptions are not supported.")
+            )
+        try:
+            uid = component.uid.value.strip()
+            name = component.summary.value
+            start = component.dtstart.value
+            end = component.dtend.value
+        except AttributeError as exc:
+            raise ValidationError(
+                self.env._("Each ICS event needs a UID, title, start, and end.")
+            ) from exc
+        if (
+            not uid
+            or not name
+            or not isinstance(start, (date, datetime))
+            or type(start) is not type(end)
+        ):
+            raise ValidationError(
+                self.env._("An ICS event has invalid required values.")
+            )
+
+        allday, start_utc, end_utc, last_date = self._event_dates(start, end)
+
+        rule = component.rrule.value if "rrule" in component.contents else False
+        if rule and (self.import_start_date or self.import_end_date):
+            raise ValidationError(
+                self.env._("Date filters are not supported for recurring ICS events.")
+            )
+        if rule:
+            try:
+                recurrence_values = self.env["calendar.recurrence"]._rrule_parse(
+                    rule, start_utc
                 )
-                if event:
-                    self._update_event(
-                        event, ics_event, event_start_date, event_end_date
-                    )
-                else:
-                    self._create_event(ics_event, event_start_date, event_end_date)
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValidationError(
+                    self.env._("Invalid ICS recurrence rule.")
+                ) from exc
+        if self.import_start_date and start_utc.date() < self.import_start_date:
+            return False
+        if self.import_end_date and last_date > self.import_end_date:
+            return False
 
-    def _parse_date(self, date_str):
-        return datetime.strptime(date_str, "%Y%m%dT%H%M%SZ")
+        vals = {
+            "name": name,
+            "start": start_utc,
+            "stop": end_utc,
+            "allday": allday,
+        }
+        if rule:
+            vals.update(
+                {
+                    "recurrency": True,
+                    "rrule": rule,
+                    "event_tz": (
+                        "UTC"
+                        if allday
+                        else getattr(start.tzinfo, "zone", None) or "UTC"
+                    ),
+                }
+            )
+        events = self.env["calendar.event"].with_context(dont_notify=True)
+        event = events.search([("event_identifier", "=", uid)], limit=1)
+        if event:
+            if event.recurrency and not rule:
+                vals["recurrency"] = False
+            if event.recurrency and rule:
+                vals["recurrence_update"] = "all_events"
+                vals.update(recurrence_values)
+                vals.pop("rrule")
+            if self.partner_id not in event.partner_ids:
+                vals["partner_ids"] = [Command.link(self.partner_id.id)]
+            event.write(vals)
+        else:
+            vals["event_identifier"] = uid
+            vals["partner_ids"] = [Command.link(self.partner_id.id)]
+            events.create(vals)
+        return uid
 
-    def _update_event(self, event, ics_event, event_start_date, event_end_date):
-        vals = {}
-        if event.start != event_start_date:
-            vals["start"] = event_start_date
-        if event.stop != event_end_date:
-            vals["stop"] = event_end_date
-        if event.name != ics_event["SUMMARY"]:
-            vals["name"] = ics_event["SUMMARY"]
-        if self.partner_id not in event.partner_ids:
-            vals["partner_ids"] = [(4, self.partner_id.id, 0)]
-        event.write(vals)
+    def _event_dates(self, start, end):
+        allday = isinstance(start, date) and not isinstance(start, datetime)
+        if allday:
+            start_utc = datetime.combine(start, time.min)
+            last_date = end - timedelta(days=1)
+            end_utc = datetime.combine(last_date, time.min)
+            valid = end > start
+        else:
+            start_utc = self._to_utc(start)
+            end_utc = self._to_utc(end)
+            last_date = end_utc.date()
+            valid = end_utc > start_utc
+        if not valid:
+            raise ValidationError(self.env._("An ICS event must end after it starts."))
+        return allday, start_utc, end_utc, last_date
 
-    def _create_event(self, ics_event, event_start_date, event_end_date):
-        self.env["calendar.event"].create(
-            {
-                "start": event_start_date,
-                "stop": event_end_date,
-                "name": ics_event["SUMMARY"],
-                "event_identifier": ics_event["UID"],
-                "partner_ids": [(4, self.partner_id.id)],
-            }
-        )
+    def _to_utc(self, value):
+        if value.tzinfo is None:
+            zone = pytz.timezone(self.env.user.tz or "UTC")
+            try:
+                value = zone.localize(value, is_dst=None)
+            except (pytz.AmbiguousTimeError, pytz.NonExistentTimeError) as exc:
+                raise ValidationError(
+                    self.env._("The ICS event has an ambiguous local time.")
+                ) from exc
+        return value.astimezone(timezone.utc).replace(tzinfo=None)
 
-    def _delete_non_imported_events(self, imported_events):
+    def _delete_non_imported_events(self, imported_uids):
         domain = [
             ("event_identifier", "!=", False),
-            ("event_identifier", "not in", imported_events),
+            ("event_identifier", "not in", list(imported_uids)),
             ("partner_ids", "in", self.partner_id.id),
         ]
-
         if self.import_start_date:
             domain.append(("start", ">=", self.import_start_date))
-
         if self.import_end_date:
-            domain.append(("stop", "<=", self.import_end_date))
-
-        non_imported_events = self.env["calendar.event"].search(domain)
-        for non_imported_event in non_imported_events:
-            non_imported_event.write({"partner_ids": [(3, self.partner_id.id)]})
-        if not non_imported_events.partner_ids:
-            non_imported_events.unlink()
-
-    def convert_date_to_z(self, line):
-        split_parts = line.split(":")
-        event_phase = split_parts[0].split(";TZID=")[0]
-        tz_id = split_parts[0].split(";TZID=")[1]
-        date = split_parts[1]
-
-        date_obj = parser.parse(date)
-        tz = pytz.timezone(tz_id)
-
-        utc_date = tz.localize(date_obj).astimezone(pytz.UTC)
-        utc_date_string = utc_date.strftime(event_phase + ":%Y%m%dT%H%M%SZ")
-        return utc_date_string
+            domain.append(
+                ("stop", "<=", datetime.combine(self.import_end_date, time.max))
+            )
+        for event in self.env["calendar.event"].search(domain):
+            if len(event.with_context(active_test=False).partner_ids) == 1:
+                event.unlink()
+            else:
+                event.write({"partner_ids": [Command.unlink(self.partner_id.id)]})

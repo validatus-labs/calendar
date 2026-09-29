@@ -6,4 +6,4 @@ from odoo import fields, models
 
 class CalendarEvent(models.Model):
     _inherit = "calendar.event"
-    event_identifier = fields.Char("Event Id")
+    event_identifier = fields.Char("Event Id", copy=False, index=True)
