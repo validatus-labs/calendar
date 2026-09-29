@@ -4,11 +4,12 @@
 {
     "name": "Calendar - Export ics",
     "summary": "Allow exporting odoo calendar to an ics file",
-    "version": "18.0.1.0.1",
+    "version": "19.0.1.0.0",
     "author": "ForgeFlow S.L.,Odoo Community Association (OCA)",
     "website": "https://github.com/OCA/calendar",
     "license": "AGPL-3",
     "depends": ["calendar"],
+    "external_dependencies": {"python": ["vobject"]},
     "data": [
         "security/calendar_export_security.xml",
         "security/ir.model.access.csv",

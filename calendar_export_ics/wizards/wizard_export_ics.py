@@ -3,7 +3,7 @@
 
 
 import base64
-from datetime import date
+from datetime import date, datetime, time, timedelta
 
 import vobject
 
@@ -48,17 +48,34 @@ class CalendarExportIcs(models.TransientModel):
     def generate_ics_content(self):
         domain = []
         if self.export_end_date:
-            domain.append(("start", "<=", self.export_end_date))
+            domain.append(
+                ("start", "<=", datetime.combine(self.export_end_date, time.max))
+            )
         domain.append(("start", ">=", date.today()))
         domain.append(("partner_ids", "in", [self.partner_id.id]))
         events = self.env["calendar.event"].search(domain)
 
         individual_ics_files = events._get_ics_file()
         combined_cal = vobject.iCalendar()
+        selected_ids = set(events.ids)
 
-        for ics_content in individual_ics_files.values():
+        for event_id, ics_content in individual_ics_files.items():
+            meeting = events.browse(event_id)
+            base_event = meeting.recurrence_id.base_event_id
+            export_series = (
+                not self.export_end_date
+                and meeting.follow_recurrence
+                and base_event.id in selected_ids
+            )
+            if export_series and meeting != base_event:
+                continue
             cal = vobject.readOne(ics_content.decode("utf-8"))
             for event in cal.vevent_list:
+                if meeting.allday:
+                    event.dtstart.value = meeting.start_date
+                    event.dtend.value = meeting.stop_date + timedelta(days=1)
+                if meeting.recurrence_id and not export_series:
+                    event.contents.pop("rrule", None)
                 combined_cal.add(event)
 
         combined_ics_content = combined_cal.serialize().encode("utf-8")

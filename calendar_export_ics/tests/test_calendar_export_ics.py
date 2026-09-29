@@ -4,8 +4,11 @@
 import base64
 from datetime import date, datetime
 
+import vobject
 from freezegun import freeze_time
 
+from odoo import Command
+from odoo.exceptions import AccessError
 from odoo.tests.common import TransactionCase
 
 
@@ -83,3 +86,135 @@ class TestExportIcs(TransactionCase):
         self.assertNotIn("SUMMARY:Event 3", ics_content)
         self.assertNotIn("SUMMARY:Event 5", ics_content)
         self.assertNotIn("SUMMARY:Event 6", ics_content)
+
+    @freeze_time("2024-05-21")
+    def test_export_group_access(self):
+        admin = self.env.ref("base.user_admin")
+        wizard = self.export_wiz.with_user(admin)
+        with self.assertRaises(AccessError):
+            wizard.create({"partner_id": admin.partner_id.id})
+
+        admin.write(
+            {
+                "group_ids": [
+                    Command.link(
+                        self.env.ref("calendar_export_ics.group_calendar_export").id
+                    )
+                ]
+            }
+        )
+        export = wizard.create({"partner_id": admin.partner_id.id})
+        self.assertEqual(export.button_export()["res_id"], export.id)
+
+    @freeze_time("2024-05-21")
+    def test_empty_and_single_event_exports(self):
+        for end_date, expected in [
+            (date(2024, 5, 23), []),
+            (date(2024, 5, 24), ["Event 5"]),
+        ]:
+            with self.subTest(end_date=end_date):
+                wiz = self.export_wiz.create(
+                    {"partner_id": self.partner_2.id, "export_end_date": end_date}
+                )
+                action = wiz.button_export()
+                calendar = vobject.readOne(
+                    base64.b64decode(wiz.export_ics_file).decode("utf-8")
+                )
+                self.assertEqual(
+                    [
+                        event.summary.value
+                        for event in calendar.contents.get("vevent", [])
+                    ],
+                    expected,
+                )
+                self.assertEqual(action["res_id"], wiz.id)
+                self.assertTrue(wiz.export_ics_filename.endswith(".ics"))
+
+    @freeze_time("2024-05-21")
+    def test_all_day_event_export(self):
+        self.event_model.create(
+            {
+                "name": "All Day Event",
+                "start": datetime(2024, 5, 25),
+                "stop": datetime(2024, 5, 26),
+                "allday": True,
+                "partner_ids": [(4, self.partner_1.id)],
+            }
+        )
+        wiz = self.export_wiz.create(
+            {"partner_id": self.partner_1.id, "export_end_date": date(2024, 5, 25)}
+        )
+        calendar = vobject.readOne(
+            base64.b64decode(wiz.generate_ics_content()).decode("utf-8")
+        )
+        all_day = next(
+            event
+            for event in calendar.vevent_list
+            if event.summary.value == "All Day Event"
+        )
+        self.assertNotIsInstance(all_day.dtstart.value, datetime)
+        self.assertNotIsInstance(all_day.dtend.value, datetime)
+        self.assertEqual(all_day.dtstart.value, date(2024, 5, 25))
+        self.assertEqual(all_day.dtend.value, date(2024, 5, 27))
+
+    @freeze_time("2024-05-21")
+    def test_recurring_event_export(self):
+        self.event_model.create(
+            {
+                "name": "Recurring Event",
+                "start": datetime(2024, 5, 25, 12),
+                "stop": datetime(2024, 5, 25, 13),
+                "rrule": "FREQ=DAILY;INTERVAL=1;COUNT=2",
+                "recurrency": True,
+                "partner_ids": [(4, self.partner_1.id)],
+            }
+        )
+        wiz = self.export_wiz.create({"partner_id": self.partner_1.id})
+        calendar = vobject.readOne(
+            base64.b64decode(wiz.generate_ics_content()).decode("utf-8")
+        )
+        recurring = [
+            event
+            for event in calendar.vevent_list
+            if event.summary.value == "Recurring Event"
+        ]
+        self.assertTrue(recurring)
+        self.assertEqual(len(recurring), 1)
+        self.assertTrue(any(event.rrule.value for event in recurring))
+
+        wiz.export_end_date = date(2024, 5, 26)
+        calendar = vobject.readOne(
+            base64.b64decode(wiz.generate_ics_content()).decode("utf-8")
+        )
+        recurring = [
+            event
+            for event in calendar.vevent_list
+            if event.summary.value == "Recurring Event"
+        ]
+        self.assertEqual(len(recurring), 2)
+        self.assertTrue(all("rrule" not in event.contents for event in recurring))
+
+    @freeze_time("2024-05-21")
+    def test_timezone_aware_event_export(self):
+        self.event_model.create(
+            {
+                "name": "Timezone Event",
+                "start": datetime(2024, 5, 25, 20),
+                "stop": datetime(2024, 5, 25, 21),
+                "event_tz": "America/New_York",
+                "partner_ids": [(4, self.partner_1.id)],
+            }
+        )
+        wiz = self.export_wiz.create(
+            {"partner_id": self.partner_1.id, "export_end_date": date(2024, 5, 25)}
+        )
+        calendar = vobject.readOne(
+            base64.b64decode(wiz.generate_ics_content()).decode("utf-8")
+        )
+        event = next(
+            event
+            for event in calendar.vevent_list
+            if event.summary.value == "Timezone Event"
+        )
+        self.assertEqual(event.dtstart.value.utcoffset().total_seconds(), 0)
+        self.assertEqual(event.dtstart.value.hour, 20)
