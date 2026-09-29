@@ -3,15 +3,18 @@
 
 import base64
 from datetime import date, datetime
+from unittest.mock import patch
 
 import vobject
 from freezegun import freeze_time
 
 from odoo import Command
 from odoo.exceptions import AccessError
+from odoo.tests import tagged
 from odoo.tests.common import TransactionCase
 
 
+@tagged("-at_install", "post_install")
 class TestExportIcs(TransactionCase):
     def setUp(self):
         super().setUp()
@@ -156,6 +159,36 @@ class TestExportIcs(TransactionCase):
         self.assertNotIsInstance(all_day.dtend.value, datetime)
         self.assertEqual(all_day.dtstart.value, date(2024, 5, 25))
         self.assertEqual(all_day.dtend.value, date(2024, 5, 27))
+
+    @freeze_time("2024-05-21")
+    def test_all_day_export_with_timed_source(self):
+        event = self.event_model.create(
+            {
+                "name": "All Day Event",
+                "start": datetime(2024, 5, 25),
+                "stop": datetime(2024, 5, 26),
+                "allday": True,
+                "partner_ids": [Command.link(self.partner_1.id)],
+            }
+        )
+        source = (
+            b"BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\n"
+            b"UID:all-day@example.com\nSUMMARY:All Day Event\n"
+            b"DTSTART;TZID=America/New_York:20240525T000000\n"
+            b"DTEND;TZID=America/New_York:20240526T000000\n"
+            b"END:VEVENT\nEND:VCALENDAR"
+        )
+        wizard = self.export_wiz.create(
+            {"partner_id": self.partner_1.id, "export_end_date": date(2024, 5, 25)}
+        )
+        with patch.object(
+            type(self.event_model), "_get_ics_file", return_value={event.id: source}
+        ):
+            calendar = vobject.readOne(
+                base64.b64decode(wizard.generate_ics_content()).decode("utf-8")
+            )
+        self.assertEqual(calendar.vevent.dtstart.value, date(2024, 5, 25))
+        self.assertEqual(calendar.vevent.dtend.value, date(2024, 5, 27))
 
     @freeze_time("2024-05-21")
     def test_recurring_event_export(self):

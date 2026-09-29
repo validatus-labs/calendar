@@ -72,8 +72,15 @@ class CalendarExportIcs(models.TransientModel):
             cal = vobject.readOne(ics_content.decode("utf-8"))
             for event in cal.vevent_list:
                 if meeting.allday:
-                    event.dtstart.value = meeting.start_date
-                    event.dtend.value = meeting.stop_date + timedelta(days=1)
+                    for name, value in (
+                        ("dtstart", meeting.start_date),
+                        ("dtend", meeting.stop_date + timedelta(days=1)),
+                    ):
+                        event.contents.pop(name, None)
+                        line = event.add(name)
+                        line.value = value.strftime("%Y%m%d")
+                        line.value_param = "DATE"
+                        line.isNative = False
                 if meeting.recurrence_id and not export_series:
                     event.contents.pop("rrule", None)
                 combined_cal.add(event)
