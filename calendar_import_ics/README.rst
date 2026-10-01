@@ -46,11 +46,13 @@ rules.
 Usage
 =====
 
-**Before you start.** Ask an administrator for the **Calendar Import
-Ics** access group. An ICS file is a calendar exchange file with a
-``.ics`` extension. Each event needs a unique identifier (UID), a title,
-a start, and an end. The wizard imports events into your own Odoo
-calendar.
+**Before you start.** The **Import Ics File** menu is hidden until an
+administrator assigns your user to the **Calendar Import Ics** access
+group. In developer mode, the administrator can open **Settings → Users
+& Companies → Groups**, find that group, and add your user. An ICS file
+is a calendar exchange file with a ``.ics`` extension. Each event needs
+a unique identifier (UID), a title, a start, and an end. The wizard
+imports events into your own Odoo calendar.
 
 1. In the **Calendar** app, open **Configuration** and select **Import
    Ics File**. The import form appears.
