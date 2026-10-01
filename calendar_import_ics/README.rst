@@ -35,8 +35,8 @@ Calendar - Import ics
 This addon adds a Calendar wizard for uploading an iCalendar (``.ics``)
 file. It creates calendar events from the file and uses each event's
 unique identifier (UID) to update the same event on a later import. It
-supports timed events, all-day events, time zones, and basic repeating
-rules.
+imports event descriptions and supports timed events, all-day events,
+time zones, and basic repeating rules.
 
 **Table of contents**
 
@@ -72,10 +72,10 @@ imports events into your own Odoo calendar.
    UID. Importing the same file again should not create extra events.
 
 **Check the result and handle errors.** Open the **Calendar** app and
-check an imported event's title and dates. For example, an all-day event
-that starts on 1 September and has an exclusive ICS end date of 3
-September appears in Odoo on 1 and 2 September. A timed event is
-converted from its ICS time zone to the corresponding Odoo time.
+check an imported event's title, description, and dates. For example, an
+all-day event that starts on 1 September and has an exclusive ICS end
+date of 3 September appears in Odoo on 1 and 2 September. A timed event
+is converted from its ICS time zone to the corresponding Odoo time.
 
 If Odoo rejects the file, correct it and upload it again. The wizard
 rejects malformed files, events without required fields, and recurrence

@@ -10,6 +10,7 @@ import vobject
 
 from odoo import Command, fields, models
 from odoo.exceptions import ValidationError
+from odoo.tools import plaintext2html
 
 
 class CalendarImportIcs(models.TransientModel):
@@ -114,6 +115,8 @@ class CalendarImportIcs(models.TransientModel):
             "stop": end_utc,
             "allday": allday,
         }
+        if "description" in component.contents:
+            vals["description"] = plaintext2html(component.description.value)
         if rule:
             vals.update(
                 {

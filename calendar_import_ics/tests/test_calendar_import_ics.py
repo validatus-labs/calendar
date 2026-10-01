@@ -19,6 +19,7 @@ class TestImportIcs(TransactionCase):
         self.user.group_ids = [
             Command.link(self.env.ref("calendar_import_ics.group_calendar_import").id)
         ]
+        self.partner = self.env["res.partner"].create({"name": "ICS test calendar"})
         self.event_model = self.env["calendar.event"].with_user(self.user)
         self.import_wiz = self.env["calendar.import.ics"].with_user(self.user)
 
@@ -34,11 +35,18 @@ class TestImportIcs(TransactionCase):
                 "import_ics_file": base64.b64encode(content.encode()),
                 "import_ics_filename": "events.ics",
                 "do_remove_old_event": False,
+                "partner_id": self.partner.id,
                 **values,
             }
         )
         wizard.button_import()
         return wizard
+
+    def test_default_partner(self):
+        wizard = self._import_content(
+            "BEGIN:VCALENDAR\nVERSION:2.0\nEND:VCALENDAR", partner_id=False
+        )
+        self.assertEqual(wizard.partner_id, self.user.partner_id)
 
     def test_import_ics(self):
         events_before_imp = self.event_model.search([])
@@ -47,10 +55,11 @@ class TestImportIcs(TransactionCase):
             {
                 "import_ics_file": self._get_test_file(filename),
                 "import_ics_filename": filename,
+                "partner_id": self.partner.id,
             }
         )
         wiz.button_import()
-        self.assertEqual(wiz.partner_id.id, self.user.partner_id.id)
+        self.assertEqual(wiz.partner_id.id, self.partner.id)
         events_after_imp = self.event_model.search([])
         self.assertEqual(len(events_after_imp) - len(events_before_imp), 4)
         uid = "ed27f2b89f945c7692547a2903c20cbe80de6cc6"
@@ -62,12 +71,13 @@ class TestImportIcs(TransactionCase):
         self.assertEqual(event_1.start, start_date)
         self.assertEqual(event_1.stop, end_date)
         self.assertEqual(event_1.name, name)
-        self.assertEqual(event_1.partner_ids.ids, [self.user.partner_id.id])
+        self.assertEqual(event_1.partner_ids.ids, [self.partner.id])
         filename = "test_calendar_2.ics"
         wiz = self.import_wiz.create(
             {
                 "import_ics_file": self._get_test_file(filename),
                 "import_ics_filename": filename,
+                "partner_id": self.partner.id,
             }
         )
         wiz.button_import()
@@ -79,7 +89,7 @@ class TestImportIcs(TransactionCase):
         self.assertEqual(event_1.start, start_date)
         self.assertEqual(event_1.stop, end_date)
         self.assertEqual(event_1.name, name)
-        self.assertEqual(event_1.partner_ids.ids, [self.user.partner_id.id])
+        self.assertEqual(event_1.partner_ids.ids, [self.partner.id])
         filename = "test_calendar_3.ics"
         wiz = self.import_wiz.create(
             {
@@ -87,6 +97,7 @@ class TestImportIcs(TransactionCase):
                 "import_ics_filename": filename,
                 "import_start_date": datetime(2004, 10, 10),
                 "import_end_date": datetime(2044, 10, 10),
+                "partner_id": self.partner.id,
             }
         )
         wiz.button_import()
@@ -141,6 +152,37 @@ END:VCALENDAR"""
                 ]
             ),
             2,
+        )
+
+    def test_description_import_and_update(self):
+        content = """BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+UID:description@example.com
+SUMMARY:Described event
+DESCRIPTION:First line\\nSecond <script>alert(1)</script>
+DTSTART:20261015T120000Z
+DTEND:20261015T130000Z
+END:VEVENT
+END:VCALENDAR"""
+        self._import_content(content)
+        event = self.event_model.search(
+            [("event_identifier", "=", "description@example.com")]
+        )
+        self.assertIn("First line", event.description)
+        self.assertIn("Second &lt;script&gt;alert(1)&lt;/script&gt;", event.description)
+        self.assertNotIn("<script>", event.description)
+
+        self._import_content(content.replace("First line\\nSecond", "Updated"))
+        self.assertIn(
+            "Updated &lt;script&gt;alert(1)&lt;/script&gt;", event.description
+        )
+        self.assertNotIn("First line", event.description)
+        self.assertEqual(
+            self.event_model.search_count(
+                [("event_identifier", "=", "description@example.com")]
+            ),
+            1,
         )
 
     def test_recurring_event_import_is_idempotent(self):
