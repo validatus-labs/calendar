@@ -421,10 +421,13 @@ Odoo creates new events and updates existing events with the same
 UID. Importing the same file again should not create extra events.</li>
 </ol>
 <p><strong>Check the result and handle errors.</strong> Open the <strong>Calendar</strong> app and
-check an imported event’s title, description, and dates. For example, an
-all-day event that starts on 1 September and has an exclusive ICS end
-date of 3 September appears in Odoo on 1 and 2 September. A timed event
-is converted from its ICS time zone to the corresponding Odoo time.</p>
+check an imported event’s title, description, and dates. Outlook
+formatting in <tt class="docutils literal"><span class="pre">X-ALT-DESC</span></tt> is imported when it contains HTML, but an
+image with an empty <tt class="docutils literal">src</tt> in the ICS file cannot be displayed. For
+example, an all-day event that starts on 1 September and has an
+exclusive ICS end date of 3 September appears in Odoo on 1 and 2
+September. A timed event is converted from its ICS time zone to the
+corresponding Odoo time.</p>
 <p>If Odoo rejects the file, correct it and upload it again. The wizard
 rejects malformed files, events without required fields, and recurrence
 exceptions such as <tt class="docutils literal">EXDATE</tt> or <tt class="docutils literal"><span class="pre">RECURRENCE-ID</span></tt>. A rejected import

@@ -7,10 +7,11 @@ from datetime import date, datetime, time, timedelta, timezone
 
 import pytz
 import vobject
+from lxml import html
 
 from odoo import Command, fields, models
 from odoo.exceptions import ValidationError
-from odoo.tools import plaintext2html
+from odoo.tools import html_sanitize, plaintext2html
 
 
 class CalendarImportIcs(models.TransientModel):
@@ -115,8 +116,9 @@ class CalendarImportIcs(models.TransientModel):
             "stop": end_utc,
             "allday": allday,
         }
-        if "description" in component.contents:
-            vals["description"] = plaintext2html(component.description.value)
+        description = self._event_description(component)
+        if description is not None:
+            vals["description"] = description
         if rule:
             vals.update(
                 {
@@ -146,6 +148,23 @@ class CalendarImportIcs(models.TransientModel):
             vals["partner_ids"] = [Command.link(self.partner_id.id)]
             events.create(vals)
         return uid
+
+    def _event_description(self, component):
+        rich_description = component.contents.get("x-alt-desc", [])
+        if (
+            rich_description
+            and rich_description[0].value.strip()
+            and "text/html" in rich_description[0].params.get("FMTTYPE", [])
+        ):
+            rich_html = html.fragment_fromstring(
+                html_sanitize(rich_description[0].value), create_parent=True
+            )
+            for image in rich_html.xpath(".//img[not(normalize-space(@src))]"):
+                image.drop_tree()
+            return html.tostring(rich_html, encoding="unicode")
+        if "description" in component.contents:
+            return plaintext2html(component.description.value)
+        return None
 
     def _event_dates(self, start, end):
         allday = isinstance(start, date) and not isinstance(start, datetime)

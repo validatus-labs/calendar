@@ -72,10 +72,13 @@ imports events into your own Odoo calendar.
    UID. Importing the same file again should not create extra events.
 
 **Check the result and handle errors.** Open the **Calendar** app and
-check an imported event's title, description, and dates. For example, an
-all-day event that starts on 1 September and has an exclusive ICS end
-date of 3 September appears in Odoo on 1 and 2 September. A timed event
-is converted from its ICS time zone to the corresponding Odoo time.
+check an imported event's title, description, and dates. Outlook
+formatting in ``X-ALT-DESC`` is imported when it contains HTML, but an
+image with an empty ``src`` in the ICS file cannot be displayed. For
+example, an all-day event that starts on 1 September and has an
+exclusive ICS end date of 3 September appears in Odoo on 1 and 2
+September. A timed event is converted from its ICS time zone to the
+corresponding Odoo time.
 
 If Odoo rejects the file, correct it and upload it again. The wizard
 rejects malformed files, events without required fields, and recurrence

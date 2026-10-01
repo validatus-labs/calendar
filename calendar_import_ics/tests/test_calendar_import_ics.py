@@ -173,11 +173,19 @@ END:VCALENDAR"""
         self.assertIn("Second &lt;script&gt;alert(1)&lt;/script&gt;", event.description)
         self.assertNotIn("<script>", event.description)
 
-        self._import_content(content.replace("First line\\nSecond", "Updated"))
-        self.assertIn(
-            "Updated &lt;script&gt;alert(1)&lt;/script&gt;", event.description
+        rich_content = content.replace(
+            "DESCRIPTION:First line\\nSecond <script>alert(1)</script>",
+            "DESCRIPTION:Updated plain\n"
+            "X-ALT-DESC;FMTTYPE=text/html:<div>Updated <i>rich</i> <b>text</b>"
+            '<script>alert(1)</script><img src="" id="x_image_0"></div>',
         )
+        self._import_content(rich_content)
+        self.assertIn("<i>rich</i>", event.description)
+        self.assertIn("<b>text</b>", event.description)
         self.assertNotIn("First line", event.description)
+        self.assertNotIn("Updated plain", event.description)
+        self.assertNotIn("<script>", event.description)
+        self.assertNotIn("<img", event.description)
         self.assertEqual(
             self.event_model.search_count(
                 [("event_identifier", "=", "description@example.com")]
