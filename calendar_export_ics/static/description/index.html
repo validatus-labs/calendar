@@ -392,20 +392,31 @@ into an .ics file.</p>
 </div>
 <div class="section" id="usage">
 <h2><a class="toc-backref" href="#toc-entry-1">Usage</a></h2>
-<p>The user needs access to Calendar Configuration and the Calendar Export
-Ics security group. To use the module, follow these steps:</p>
+<p><strong>Before you start.</strong> Installing this addon does not assign users to the
+<strong>Calendar Export Ics</strong> access group, so <strong>Export to Ics File</strong> is
+hidden by default. In developer mode, an administrator can open
+<strong>Settings → Users &amp; Companies → Groups</strong>, find that group, and add your
+user. You also need access to Calendar Configuration.</p>
+<p>To check the export with events whose details you know:</p>
 <ol class="arabic simple">
-<li>Navigate to the Calendar App.</li>
-<li>Go to Configuration.</li>
-<li>Select Export to ICS File.</li>
+<li>In <strong>Calendar</strong>, create two future timed events and one future
+all-day event. Give each a distinct title, include yourself as an
+attendee, and note their start and end dates and times.</li>
+<li>Open <strong>Calendar → Configuration → Export to Ics File</strong>.</li>
+<li>Set <strong>End Export Date</strong> to the date of the last test event or later.
+Leave it empty to include all future events from your calendar.</li>
+<li>Select <strong>Generate ICS File</strong> and download the resulting <tt class="docutils literal">.ics</tt>
+file.</li>
+<li>Open the file in a text editor. It should contain one <tt class="docutils literal">VCALENDAR</tt>
+with a <tt class="docutils literal">VEVENT</tt> for each included event. Check each <tt class="docutils literal">SUMMARY</tt>
+against its title and each <tt class="docutils literal">DTSTART</tt> and <tt class="docutils literal">DTEND</tt> against its
+dates and times. Timed values can be written in UTC rather than your
+displayed time zone; an all-day event uses dates, and its ICS end
+date is the day after the final day shown in Odoo.</li>
 </ol>
-<p>When exporting, you have two options:</p>
-<ul class="simple">
-<li>Specify the final date to include events that start on that date or
-earlier.</li>
-<li>Leave the date field empty to export all future events from your
-calendar.</li>
-</ul>
+<p>The export includes other future events for which you are an attendee,
+so the file can contain more events than the three test events. Events
+without your attendee record are not included.</p>
 </div>
 <div class="section" id="bug-tracker">
 <h2><a class="toc-backref" href="#toc-entry-2">Bug Tracker</a></h2>
